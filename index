@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поиск книги</title>
+<style>
+    /* добавьте стили CSS здесь */
+</style>
+</head>
+<body>
+
+<h1>Поиск книги</h1>
+
+<div>
+    <input type="text" id="bookInput" placeholder="Введите название книги">
+    <button onclick="searchBooks()">Поиск</button>
+</div>
+
+<div id="bookList">
+    <!-- Здесь будет отображаться список книг -->
+</div>
+
+<div id="buyForm" style="display: none;">
+    <!-- Здесь будет отображаться форма для ввода данных -->
+</div>
+
+<script>
+    function searchBooks() {
+        const input = document.getElementById('bookInput').value;
+        const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(input)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                displayBooks(data.items);
+            })
+            .catch(error => console.error('Ошибка:', error));
+    }
+
+    function displayBooks(books) {
+        const bookList = document.getElementById('bookList');
+        bookList.innerHTML = '';
+
+        books.forEach(book => {
+            const title = book.volumeInfo.title;
+            const authors = book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Автор неизвестен';
+
+            const bookItem = document.createElement('div');
+            bookItem.innerHTML = `<p><strong>Название:</strong> ${title}</p>
+                                 <p><strong>Авторы:</strong> ${authors}</p>
+                                 <button onclick="showBuyForm('${title}', '${authors}')">Купить</button>`;
+            bookList.appendChild(bookItem);
+        });
+    }
+
+    function showBuyForm(bookTitle, author) {
+        const buyFormDiv = document.getElementById('buyForm');
+        buyFormDiv.innerHTML = '';
+
+        const form = document.createElement('form');
+        form.innerHTML = `<h2>Покупка книги: ${bookTitle}</h2>
+                          <label for="name">Имя:</label><br>
+                          <input type="text" id="name" name="name" required><br>
+                          <label for="email">Email:</label><br>
+                          <input type="email" id="email" name="email" required><br>
+                          <label for="phone">Телефон:</label><br>
+                          <input type="tel" id="phone" name="phone" required><br>
+                          <label for="address">Адрес:</label><br>
+                          <textarea id="address" name="address" required></textarea><br>
+                          <input type="submit" value="Отправить">`;
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            // код для отправки данных на сервер
+        });
+
+        buyFormDiv.appendChild(form);
+        buyFormDiv.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
